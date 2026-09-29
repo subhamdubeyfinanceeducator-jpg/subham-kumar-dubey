@@ -31,7 +31,7 @@ if(nt&&NO.text){nt.textContent=NO.text+' ';if(NO.link){const a=document.createEl
 const sort=a=>a.slice().sort((x,z)=>z.date<x.date?-1:1);
 function card(u){const c=document.createElement('article');c.className='card item';
 const m=document.createElement('p');m.className='meta';m.textContent=new Date(u.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+' | '+u.cat;
-const t=document.createElement('h3');t.textContent=u.title;const s=document.createElement('p');s.style.color='var(--muted)';s.textContent=u.summary;c.append(m,t,s);
+const t=document.createElement('h3');t.textContent=u.title;const s=document.createElement('p');s.style.color='var(--muted)';s.style.whiteSpace='pre-line';s.textContent=u.summary;c.append(m,t,s);
 if(u.img){const l=document.createElement('a');l.href=u.img;l.target='_blank';l.rel='noopener';const i=document.createElement('img');i.className='pic';i.src=u.img;i.alt=u.title;i.loading='lazy';l.appendChild(i);c.appendChild(l)}
 if(u.link){const a=document.createElement('a');a.className='src';a.href=u.link;a.rel='noopener';if(/^https?:/.test(u.link))a.target='_blank';a.textContent=u.linkLabel||'Official source';c.appendChild(a)}
 return c}
