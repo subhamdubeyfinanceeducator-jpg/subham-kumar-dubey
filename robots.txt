@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://subham-kumar-dubey.vercel.app/sitemap.xml
