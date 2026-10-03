@@ -43,6 +43,30 @@ if(more)more.onclick=()=>{all=true;draw()};draw()}
 const il=$('insList');
 if(il&&AR.length){il.textContent='';sort(AR).forEach(a=>il.appendChild(card(a)));$('insLead').textContent='Articles and analysis on finance, business and legal awareness.'}
 
+/* motion: scroll reveal for all text, cards and images (skipped for reduced motion) */
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+const bar=document.createElement('div');bar.id='prog';document.body.appendChild(bar);
+const pr=()=>{const h=document.documentElement;bar.style.transform='scaleX('+(h.scrollTop/((h.scrollHeight-h.clientHeight)||1))+')'};pr();addEventListener('scroll',pr,{passive:true});
+const sel='main h1,main h2,main h3,main p,main .lead,main .card,main .cat,main .chips a,main .tools,main .btn,main .note,main .fw>div,main .stats,main .big,main .v,main form>div,footer .grid>div,footer .disc';
+const imgSel='main figure img,main .vis img';
+const all=[...document.querySelectorAll(sel)];const set=new Set(all);
+const tops=all.filter(e=>{let a=e.parentElement;while(a&&a!==document.body){if(set.has(a)&&!a.matches('.grid,.edu,.skg,.cats,.col'))return false;a=a.parentElement}return true});
+const idx=new Map();
+const place=(e,cls)=>{const par=e.parentElement;const n=idx.get(par)||0;idx.set(par,n+1);e.style.setProperty('--rd',Math.min(n*.09,.7)+'s');e.classList.add(...cls.split(' '))};
+tops.forEach((e,k)=>{if(e.closest('.hero .txt')&&e.matches('.stats'))return;place(e,'rv'+(e.closest('.hero .txt')?'':(k%5==1?' rv-l':k%5==3?' rv-r':'')))});
+const imgs=[...document.querySelectorAll(imgSel)];imgs.forEach(e=>place(e,'rv-img'));
+document.querySelectorAll('.rv,.rv-img').forEach(e=>{if(e.matches('.rv-l'))e.classList.add('rv-l')});
+document.querySelectorAll('.ph').forEach(e=>setTimeout(()=>e.classList.add('float'),1600));
+const io=new IntersectionObserver((x,o)=>x.forEach(en=>{if(en.isIntersecting){const t=en.target;t.classList.add('in');o.unobserve(t);if(!t.matches('.rv-img'))setTimeout(()=>t.classList.remove('rv','rv-l','rv-r','rv-z','in'),1900+parseFloat(t.style.getPropertyValue('--rd')||0)*1000)}}),{threshold:.08,rootMargin:'0px 0px -5% 0px'});
+document.querySelectorAll('.rv,.rv-img').forEach(e=>io.observe(e));
+/* safety net: never leave content hidden */
+setTimeout(()=>document.querySelectorAll('.rv:not(.in),.rv-img:not(.in)').forEach(e=>{const r=e.getBoundingClientRect();if(r.top<innerHeight)e.classList.add('in')}),2500);
+/* count-up for 100+ */
+document.querySelectorAll('.big').forEach(el=>{const t=100;let done=false;const run=()=>{if(done)return;done=true;const t0=performance.now();const st=n=>{const p=Math.min((n-t0)/1600,1),v=Math.round(t*(1-Math.pow(1-p,3)));el.textContent=v+'+';if(p<1)requestAnimationFrame(st)};requestAnimationFrame(st)};
+el.textContent='0+';new IntersectionObserver((x,o)=>{if(x[0].isIntersecting){run();o.disconnect()}},{threshold:.5}).observe(el)});
+/* gentle tilt on glass cards (pointer devices) */
+if(matchMedia('(hover:hover)').matches)document.querySelectorAll('main .card').forEach(c=>{c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform='perspective(800px) rotateY('+x*5+'deg) rotateX('+-y*5+'deg) translateY(-4px)'});c.addEventListener('pointerleave',()=>c.style.transform='')});
+}
 /* header shadow on scroll */
 const hd=document.querySelector('header');if(hd){const sc=()=>hd.classList.toggle('scrolled',window.scrollY>10);sc();addEventListener('scroll',sc,{passive:true})}
 /* courtroom files: expand / collapse all, open category from link hash */
