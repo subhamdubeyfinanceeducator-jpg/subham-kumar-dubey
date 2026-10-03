@@ -4,9 +4,9 @@ const $=id=>document.getElementById(id);
 const mb=$('mb'),nv=$('nav');
 mb.onclick=()=>{const o=nv.classList.toggle('open');mb.setAttribute('aria-expanded',o)};
 const path=(location.pathname.replace(/\.html$/,'').replace(/\/$/,''))||'/';
-nv.querySelectorAll('a').forEach(a=>{const p=(new URL(a.href).pathname.replace(/\.html$/,'').replace(/\/$/,''))||'/';if(p===path)a.setAttribute('aria-current','page')});
+nv.querySelectorAll('a').forEach(a=>{if(a.getAttribute('href').includes('#'))return;const p=(new URL(a.href).pathname.replace(/\.html$/,'').replace(/\/$/,''))||'/';if(p===path)a.setAttribute('aria-current','page')});
 /* language (remembered across pages) */
-const T={hi:{home:"होम",about:"परिचय",svc:"विशेषज्ञता",bf:"बिज़नेस फाइल्स",cf:"कोर्टरूम फाइल्स",lu:"कानूनी अपडेट",ins:"लेख",res:"संसाधन",spk:"वक्ता",con:"संपर्क",h1:"जटिल बिज़नेस, फाइनेंस और कानूनी अवधारणाओं को व्यावहारिक समझ में बदलना।"}};
+const T={hi:{home:"होम",about:"परिचय",svc:"विशेषज्ञता",bf:"बिज़नेस फाइल्स",cf:"कोर्टरूम फाइल्स",lu:"कानूनी अपडेट",ins:"लेख",res:"संसाधन",spk:"वक्ता",con:"संपर्क",h1:"व्यावहारिक कानूनी जानकारी, वित्तीय मार्गदर्शन और सोच-समझकर निर्णय लेने के लिए ज्ञान।"}};
 const els=[...document.querySelectorAll('[data-i]')];els.forEach(e=>e.dataset.en=e.textContent);
 const btns=[...document.querySelectorAll('.lang button')];
 function setLang(l){document.documentElement.lang=l;btns.forEach(x=>x.setAttribute('aria-pressed',x.dataset.l===l));els.forEach(e=>e.textContent=l==='hi'&&T.hi[e.dataset.i]?T.hi[e.dataset.i]:e.dataset.en);try{localStorage.setItem('lang',l)}catch(x){}}
@@ -43,19 +43,13 @@ if(more)more.onclick=()=>{all=true;draw()};draw()}
 const il=$('insList');
 if(il&&AR.length){il.textContent='';sort(AR).forEach(a=>il.appendChild(card(a)));$('insLead').textContent='Articles and analysis on finance, business and legal awareness.'}
 
-/* premium touches: italic last word, header shadow, scroll reveal */
-document.querySelectorAll('main h1.ph1,main h2').forEach(h=>{if(h.dataset.i)return;const t=h.textContent.trim().split(/\s+/);if(t.length<2)return;const last=t.pop();h.textContent=t.join(' ')+' ';const e=document.createElement('em');e.textContent=last;h.appendChild(e)});
+/* header shadow on scroll */
 const hd=document.querySelector('header');if(hd){const sc=()=>hd.classList.toggle('scrolled',window.scrollY>10);sc();addEventListener('scroll',sc,{passive:true})}
-if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
-const sel='main h1,main h2,main h3,main p,main li,main .card,main .btn,main .chain span,main .tl>div,main .fw>div,main form>div,main .vid,footer h2,footer strong,footer li,footer p';
-const imgSel='main figure.ph,main .v,main img.pic';
-const all=[...document.querySelectorAll(sel)].filter(e=>!e.closest('.crest'));
-const set=new Set(all);
-const tops=all.filter(e=>{let a=e.parentElement;while(a&&a!==document.body){if(set.has(a))return false;a=a.parentElement}return true});
-const imgs=[...document.querySelectorAll(imgSel)].filter(e=>!(e.tagName==='IMG'&&e.closest('.v,.ph')));
-const idx=new Map();
-[...tops,...imgs].forEach(e=>{const par=e.parentElement;const i=idx.get(par)||0;idx.set(par,i+1);e.style.setProperty('--rd',Math.min(i*.12,.6)+'s');e.classList.add(e.matches(imgSel)?'rv-img':'rv')});
-const io='IntersectionObserver' in window?new IntersectionObserver((x,o)=>x.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');o.unobserve(en.target)}}),{threshold:.1,rootMargin:'0px 0px -6% 0px'}):null;
-document.querySelectorAll('.rv,.rv-img').forEach(e=>io?io.observe(e):e.classList.add('in'));
-}
+/* courtroom files: expand / collapse all, open category from link hash */
+const cats=[...document.querySelectorAll('details.cat')];
+const ex=$('expAll'),co=$('colAll');
+if(ex)ex.onclick=()=>cats.forEach(d=>d.open=true);
+if(co)co.onclick=()=>cats.forEach(d=>d.open=false);
+function openHash(){const d=cats.find(x=>'#'+x.id===location.hash);if(d){d.open=true;setTimeout(()=>d.scrollIntoView({block:'start'}),50)}}
+openHash();addEventListener('hashchange',openHash);
 })();
